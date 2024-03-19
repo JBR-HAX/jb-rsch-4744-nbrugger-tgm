@@ -1,7 +1,7 @@
 package org.jetbrains.assignment.model;
 
 public record Move(
-        Direction dir,
+        Direction direction,
         int steps
 ) {
     public enum Direction {
