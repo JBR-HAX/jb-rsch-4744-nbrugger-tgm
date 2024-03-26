@@ -12,6 +12,12 @@ import java.util.List;
 @RestController
 public class RobotController {
 
+    private final RobotMoveRepository repository;
+
+    public RobotController(RobotMoveRepository repository) {
+        this.repository = repository;
+    }
+
     @PostMapping("/moves")
     public List<Move> move(@RequestBody List<Location> locations) {
         if (locations.isEmpty()) {
@@ -25,10 +31,14 @@ public class RobotController {
             if (deltaX != 0) {
                 final var xMovement = new Move(deltaX > 0 ? Move.Direction.EAST : Move.Direction.WEST, Math.abs(deltaX));
                 moves.add(xMovement);
+                //storing inside a loop is of course dangerous, but this is just an example and simple
+                //this should be collected and at the end stored in one transaction/bulk inser
+                repository.storeMoveTo(xMovement, location);
             }
             if (deltaY != 0) {
                 final var yMove = new Move(deltaY > 0 ? Move.Direction.NORTH : Move.Direction.SOUTH, Math.abs(deltaY));
                 moves.add(yMove);
+                repository.storeMoveTo(yMove, location);
             }
             lastPos = location;
         }
@@ -41,6 +51,9 @@ public class RobotController {
         var locations = new ArrayList<Location>();
         locations.add(location);
         for (var move : moves) {
+            //storing inside a loop is of course dangerous, but this is just an example and simple
+            //this should be collected and at the end stored in one transaction/bulk insert
+            repository.storeMoveFrom(location, move);
             switch (move.direction()) {
                 case EAST -> location = new Location(location.x() + move.steps(), location.y());
                 case WEST -> location = new Location(location.x() - move.steps(), location.y());
