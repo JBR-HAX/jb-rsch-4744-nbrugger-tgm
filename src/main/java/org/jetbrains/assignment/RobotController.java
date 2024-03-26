@@ -47,7 +47,7 @@ public class RobotController {
 
     @PostMapping("/locations")
     public List<Location> locations(@RequestBody List<Move> moves) {
-        var location = new Location(0,0);
+        var location = new Location(0, 0);
         var locations = new ArrayList<Location>();
         locations.add(location);
         for (var move : moves) {
